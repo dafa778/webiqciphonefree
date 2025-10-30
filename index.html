@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IQC iPhone Generator By RazorOffcial</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: black;
+      color: #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      min-height: 100vh;
+      position: relative;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    h1 {
+      color: #38bdf8;
+      text-shadow: 0 0 10px rgba(56,189,248,0.7);
+      margin-bottom: 20px;
+      z-index: 1;
+    }
+
+    .form-container {
+      background: rgba(30, 41, 59, 0.9);
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.7);
+      max-width: 420px;
+      width: 100%;
+      margin-bottom: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 1;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #f1f5f9;
+    }
+
+    input, textarea, button, a.telegram-btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      margin-bottom: 10px;
+      font-size: 14px;
+      background: #1e293b;
+      color: #f8fafc;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    textarea { resize: none; height: 80px; }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    button:hover {
+      background: #2563eb;
+      transform: scale(1.03);
+    }
+
+    a.telegram-btn {
+      background: #0088cc;
+      color: white;
+      font-weight: bold;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    a.telegram-btn:hover {
+      background: #006b99;
+      transform: scale(1.03);
+    }
+    a.telegram-btn img {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+    }
+
+    #result {
+      margin-top: 20px;
+      z-index: 1;
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+    }
+
+    #result img {
+      width: 100%;
+      border-radius: 16px;
+      border: 3px solid #ffffff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      margin-bottom: 10px;
+    }
+
+    #downloadBtn {
+      display: none;
+      background: #22c55e;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 10px;
+      transition: transform 0.15s ease, background 0.2s;
+    }
+    #downloadBtn:hover {
+      background: #16a34a;
+      transform: scale(1.03);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <h1>📱 IQC iPhone Generator</h1>
+  <div class="form-container">
+    <label>Jam</label>
+    <input type="text" id="time" placeholder="18:00">
+
+    <label>Baterai (%)</label>
+    <input type="number" id="battery" placeholder="65">
+
+    <label>Provider</label>
+    <input type="text" id="carrier" placeholder="Indosat">
+
+    <label>Pesan</label>
+    <textarea id="message" placeholder="Halo, ini test"></textarea>
+
+    <button onclick="generateQuote()">Generate</button>
+    <a href="http://t.me/vanzzmod" target="_blank" class="telegram-btn">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" alt="Telegram Logo">
+      Hubungi di Telegram
+    </a>
+  </div>
+
+  <div id="result">
+    <img id="resultImg" style="display:none;" />
+    <button id="downloadBtn" onclick="downloadImage()">💾 Simpan Gambar</button>
+  </div>
+
+  <script>
+    function generateQuote() {
+      const time = document.getElementById("time").value || "18:00";
+      const battery = document.getElementById("battery").value || "65";
+      const carrier = document.getElementById("carrier").value || "Indosat";
+      const message = document.getElementById("message").value || "Halo, ini test";
+
+      const url = `https://brat.siputzx.my.id/iphone-quoted?time=${encodeURIComponent(time)}&batteryPercentage=${battery}&carrierName=${encodeURIComponent(carrier)}&messageText=${encodeURIComponent(message)}&emojiStyle=apple`;
+
+      const resultImg = document.getElementById("resultImg");
+      const downloadBtn = document.getElementById("downloadBtn");
+
+      resultImg.style.display = "block";
+      resultImg.src = url;
+      downloadBtn.style.display = "inline-block";
+
+      // scroll ke hasil
+      document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+    }
+
+    function downloadImage() {
+      const img = document.getElementById("resultImg");
+      const link = document.createElement("a");
+      link.href = img.src;
+      link.download = "iqc_result.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Animasi bintang
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      stars = [];
+      for (let i = 0; i < 150; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5,
+          speed: Math.random() * 0.5 + 0.2
+        });
+      }
+    }
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      stars.forEach(star => {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fill();
+        star.y += star.speed;
+        if (star.y > canvas.height) {
+          star.y = 0;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(animateStars);
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+    animateStars();
+  </script>
+</body>
+</html>
